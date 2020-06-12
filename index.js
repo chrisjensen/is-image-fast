@@ -1,17 +1,18 @@
 'use strict';
 
-const request = require('sync-request');
+const request = require('request-promise-native');
 const urlParse = require('url').parse;
 const isImage = require('is-image');
 const isUrl = require('is-url');
 
-module.exports = (url, accurate, timeout) => {
+module.exports = async (url, accurate, timeout) => {
   if (!url) return false;
   const http = url.lastIndexOf('http');
   if (http != -1) url = url.substring(http);
   if (!isUrl(url)) return isImage(url);
   let pathname = urlParse(url).pathname;
   if (!pathname) return false;
+  // Remove query string from url
   const last = pathname.search(/[:?&]/);
   if (last != -1) pathname = pathname.substring(0, last);
   if (isImage(pathname)) return true;
@@ -19,8 +20,9 @@ module.exports = (url, accurate, timeout) => {
   try {
     if (!accurate) return false;
     if (!timeout) timeout = 60000;
-    const res = request('GET', url, { timeout });
+    const res = await request('GET', url, { timeout });
     if (!res) return false;
+    if (!(res.statusCode >= 200 && res.statusCode < 300)) return false;
     const headers = res.headers;
     if (!headers) return false;
     const contentType = headers['content-type'];
