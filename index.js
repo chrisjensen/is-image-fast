@@ -2,7 +2,6 @@
 
 const request = require('request-promise-native');
 const urlParse = require('url').parse;
-const isImage = require('is-image');
 const isUrl = require('is-url');
 
 module.exports = async (url, accurate, timeout) => {
@@ -15,7 +14,6 @@ module.exports = async (url, accurate, timeout) => {
   // Remove query string from url
   const last = pathname.search(/[:?&]/);
   if (last != -1) pathname = pathname.substring(0, last);
-  if (isImage(pathname)) return true;
   if (/styles/i.test(pathname)) return false;
   try {
     if (!accurate) return false;
