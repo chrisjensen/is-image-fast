@@ -6,8 +6,9 @@ describe('isImage', () => {
 	describe('Loads image', () => {
 		before(() => {
 			nock('https://image.test')
+				.log(console.log)
 				.head('/photo.png')
-				.reply(200, null, { 'content-type': 'image/png' });
+				.reply(200, 'OK', { 'content-type': 'image/png' });
 		});
 		it('identifies image', async () => {
 			const result = await isImage('https://image.test/photo.png');
@@ -18,11 +19,11 @@ describe('isImage', () => {
 		before(() => {
 			nock('https://image.test')
 				.head('/not-photo.png')
-				.reply(200, null, { 'content-type': 'text/html' });
+				.reply(200, 'OK', { 'content-type': 'text/html' });
 		});
 		it('identifies image', async () => {
 			const result = await isImage('https://image.test/not-photo.png');
-			assert(result, 'isImage === true');
+			assert(!result, 'isImage === false');
 		});
 	});
 });
